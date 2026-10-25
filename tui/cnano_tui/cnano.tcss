@@ -1,0 +1,247 @@
+Screen {
+    background: #1e1f2b;
+    layers: base overlay;
+}
+
+#titlebar {
+    height: 1;
+    background: #13141c;
+    color: #7d8199;
+}
+
+#workbench {
+    height: 1fr;
+}
+
+/* ---------- sidebar ---------- */
+#sidebar {
+    width: 32;
+    background: #181922;
+    border-right: tall #2a2c3d;
+}
+.section-title {
+    color: #7d8199;
+    text-style: bold;
+    padding: 0 1;
+    margin-top: 1;
+}
+#tree {
+    background: #181922;
+    padding: 0 0 0 1;
+    scrollbar-size-vertical: 1;
+}
+#tree:focus .tree--cursor, #tree .tree--cursor {
+    background: #a882ff33;
+    color: #eceef9;
+    text-style: none;
+}
+#tree .directory-tree--folder { color: #c8cbe0; text-style: none; }
+#tree .directory-tree--extension { text-style: none; }
+#tree .tree--guides, #tree .tree--guides-hover, #tree .tree--guides-selected { color: #2f3247; }
+#tree .directory-tree--hidden { color: #545870; }
+
+#git {
+    padding: 0 1;
+}
+#git-branch {
+    margin: 1 0;
+}
+#commit-msg {
+    border: tall #2a2c3d;
+    background: #262838;
+}
+#commit-msg:focus { border: tall #a882ff; }
+#git-list {
+    height: 1fr;
+    min-height: 4;
+    background: #181922;
+}
+#git-list > ListItem { background: #181922; padding: 0; }
+#git-list > ListItem.-highlight { background: #a882ff33; }
+#git-list:focus > ListItem.-highlight { background: #a882ff44; }
+#git-list > ListItem.git-head { margin-top: 1; }
+#git-list > ListItem.git-head:first-child { margin-top: 0; }
+#git-log {
+    height: auto;
+    max-height: 40%;
+    color: #c8cbe0;
+    overflow-y: auto;
+}
+
+/* ---------- editor ---------- */
+#main {
+    width: 1fr;
+}
+#welcome {
+    height: 1fr;
+    content-align: center middle;
+}
+#tabs {
+    height: 1fr;
+}
+#tabs > ContentTabs {
+    background: #181922;
+}
+#tabs Tab {
+    color: #7d8199;
+    padding: 0 2;
+}
+#tabs Tab.-active {
+    color: #eceef9;
+    background: #1e1f2b;
+}
+#tabs Tab:hover { color: #c8cbe0; }
+#tabs Underline > .underline--bar {
+    color: #a882ff;
+    background: #2a2c3d;
+}
+#tabs TabPane {
+    padding: 0;
+}
+CodeArea {
+    border: none;
+    padding: 0;
+    width: 1fr;
+    height: 1fr;
+    scrollbar-size-vertical: 1;
+    scrollbar-size-horizontal: 1;
+}
+CodeArea:focus { border: none; }
+.preview {
+    width: 1fr;
+    height: 1fr;
+    border-left: tall #2a2c3d;
+    padding: 1 3;
+    background: #1e1f2b;
+    overflow-y: auto;
+}
+.preview MarkdownH1 { color: #eceef9; text-style: bold; background: #1e1f2b; border-bottom: solid #2a2c3d; }
+.preview MarkdownH2 { color: #eceef9; text-style: bold; }
+.preview MarkdownH3 { color: #a882ff; }
+.preview MarkdownBlockQuote { border-left: outer #a882ff; background: #a882ff0d; }
+.preview MarkdownFence { background: #171822; }
+
+#findbar {
+    height: 3;
+    background: #13141c;
+    dock: bottom;
+}
+#findbar Input {
+    width: 1fr;
+    border: tall #2a2c3d;
+    background: #262838;
+}
+#findbar Input:focus { border: tall #a882ff; }
+
+/* ---------- chrome ---------- */
+#statusbar {
+    height: 1;
+    background: #13141c;
+}
+#sb-left { width: 1fr; }
+#sb-right { width: auto; }
+
+Footer {
+    background: #13141c;
+}
+
+/* ---------- dialogs ---------- */
+PromptScreen, ChoiceScreen {
+    align: center top;
+    background: #0008;
+}
+.dialog {
+    width: 72;
+    max-width: 90%;
+    height: auto;
+    margin-top: 3;
+    padding: 1 2;
+    background: #181922;
+    border: round #a882ff;
+}
+.dialog-title {
+    color: #c8cbe0;
+    text-style: bold;
+    margin-bottom: 1;
+}
+.dialog Input {
+    border: tall #2a2c3d;
+    background: #262838;
+}
+.dialog Input:focus { border: tall #a882ff; }
+
+CommandPalette > Vertical {
+    background: #181922;
+}
+
+/* ---------- agent panel ---------- */
+#agent {
+    width: 56;
+    background: #181922;
+    border-left: tall #2a2c3d;
+}
+#agent-header {
+    height: 1;
+    width: 1fr;
+    background: #13141c;
+}
+#agent-log {
+    height: 1fr;
+    padding: 0 1;
+    scrollbar-size-vertical: 1;
+}
+#agent-log:focus { background-tint: #a882ff08; }
+#agent-empty { margin-top: 3; }
+.msg-user {
+    margin: 1 0 0 6;
+    padding: 0 1;
+    background: #2a2440;
+    border-left: outer #a882ff;
+}
+.msg-assistant {
+    margin: 1 0 0 0;
+    padding: 0;
+    background: #181922;
+}
+.msg-assistant MarkdownFence { background: #13141c; }
+.msg-assistant MarkdownH1, .msg-assistant MarkdownH2 { background: #181922; color: #eceef9; border-bottom: none; }
+.msg-meta { color: #545870; margin-top: 1; }
+.msg-error { margin-top: 1; padding: 0 1; border-left: outer #f7768e; background: #2a1d27; }
+.thinking { margin-top: 1; }
+.tool-card {
+    margin: 1 0 0 0;
+    padding: 0;
+    border: none;
+    background: #1e1f2b;
+    border-left: outer #2f3247;
+}
+.tool-card CollapsibleTitle { padding: 0 1; color: #c8cbe0; }
+.tool-card CollapsibleTitle:hover { background: #262838; }
+.tool-card Contents { padding: 0 1 0 2; }
+.tool-card.running { border-left: outer #a882ff; }
+.tool-card.awaiting { border-left: outer #e0af68; background: #26221f; }
+.tool-card.ok { border-left: outer #9ece6a; }
+.tool-card.error { border-left: outer #f7768e; }
+.tool-card.declined { border-left: outer #545870; color: #545870; }
+.tool-body { max-height: 24; overflow-y: auto; }
+#agent-context { height: 1; padding: 0 1; }
+#agent-input {
+    border: tall #2a2c3d;
+    background: #262838;
+    margin: 0 1 1 1;
+}
+#agent-input:focus { border: tall #a882ff; }
+#agent.busy #agent-input { border: tall #7aa2f7; }
+
+/* ---------- completion & hover ---------- */
+#completion {
+    layer: overlay;
+    position: absolute;
+    background: #13141c;
+    border: round #a882ff;
+    padding: 0;
+    scrollbar-size-vertical: 1;
+}
+#completion > .option-list--option-highlighted { background: #a882ff44; text-style: none; }
+.dialog.hover { width: 90; max-height: 80%; overflow-y: auto; }
+.dialog.hover Markdown { background: #181922; }

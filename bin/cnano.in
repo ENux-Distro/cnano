@@ -1,0 +1,13 @@
+#!/bin/sh
+# cnano launcher — `cnano`, `cnano .`, `cnano path/to/file.c`
+LIB="@LIBDIR@"
+if [ "$1" = "--tui" ]; then
+  shift
+  exec "$(dirname "$(readlink -f "$0")")/cnano-tui" "$@"
+fi
+[ $# -gt 0 ] && set -- "$(realpath -m -- "$1")"
+if [ -n "$CNANO_FOREGROUND" ]; then
+  exec "$LIB/electron/electron" "$LIB/app" "$@"
+fi
+# Detach from the terminal like other GUI editors; logs go to the journal-less void.
+nohup "$LIB/electron/electron" "$LIB/app" "$@" >/dev/null 2>&1 &

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' file: data: https:; font-src 'self' data:; worker-src 'self' blob:">
+  <title>cnano</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="markdown.css">
+  <link rel="stylesheet" href="../node_modules/@xterm/xterm/css/xterm.css">
+  <link rel="stylesheet" href="panels.css">
+</head>
+<body>
+  <!-- title bar -->
+  <header id="titlebar">
+    <div class="tb-left">
+      <span class="logo">c<b>nano</b></span>
+      <nav id="menu">
+        <button data-cmd="file.openFolder">Open Folder</button>
+        <button data-cmd="file.newFile">New File</button>
+        <button data-cmd="git.clone">Clone</button>
+        <button data-cmd="palette.show">Commands</button>
+      </nav>
+    </div>
+    <div id="title-text">cnano</div>
+    <div class="tb-right">
+      <button class="wc" id="wc-min" title="Minimize"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button>
+      <button class="wc" id="wc-max" title="Maximize"><svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7"/></svg></button>
+      <button class="wc close" id="wc-close" title="Close"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+    </div>
+  </header>
+
+  <div id="workbench">
+    <!-- activity bar -->
+    <aside id="activitybar">
+      <button class="act active" data-view="explorer" title="Explorer (Ctrl+Shift+E)">
+        <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+      </button>
+      <button class="act" data-view="search" title="Search (Ctrl+Shift+F)">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+      </button>
+      <button class="act" data-view="git" title="Source Control (Ctrl+Shift+G)">
+        <svg viewBox="0 0 24 24"><circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 7.2v9.6M18 10.2c0 4-6 3-11 7"/></svg>
+        <span class="badge" id="git-badge" hidden></span>
+      </button>
+      <button class="act" data-cmd="agent.toggle" id="act-agent" title="AI Agent (Ctrl+L)">
+        <svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
+      </button>
+      <button class="act" data-cmd="terminal.toggle" id="act-term" title="Terminal (Ctrl+`)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+      </button>
+      <div class="spacer"></div>
+      <button class="act" data-cmd="settings.fontUp" title="Zoom in (Ctrl+=)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
+      </button>
+    </aside>
+
+    <!-- sidebar -->
+    <section id="sidebar">
+      <div class="view" id="view-explorer">
+        <div class="view-header">
+          <span class="view-title">Explorer</span>
+          <div class="view-actions">
+            <button data-cmd="file.newFile" title="New File"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M12 11v6M9 14h6"/></svg></button>
+            <button data-cmd="file.newFolder" title="New Folder"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6"/></svg></button>
+            <button data-cmd="explorer.refresh" title="Refresh"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>
+            <button data-cmd="explorer.collapse" title="Collapse All"><svg viewBox="0 0 24 24"><path d="M7 10l5-5 5 5M7 19l5-5 5 5"/></svg></button>
+          </div>
+        </div>
+        <div id="explorer-root-name" class="section-title"></div>
+        <div id="tree" tabindex="0"></div>
+        <div id="explorer-empty" class="empty-state">
+          <p>No folder opened.</p>
+          <button class="btn primary" data-cmd="file.openFolder">Open Folder</button>
+          <button class="btn" data-cmd="git.clone">Clone Repository</button>
+        </div>
+      </div>
+
+      <div class="view" id="view-search" hidden>
+        <div class="view-header"><span class="view-title">Search</span></div>
+        <div class="search-box">
+          <div class="input-wrap">
+            <input id="search-input" placeholder="Search" spellcheck="false">
+            <button class="toggle" id="search-case" title="Match Case">Aa</button>
+            <button class="toggle" id="search-word" title="Match Whole Word"><u>ab</u></button>
+            <button class="toggle" id="search-regex" title="Use Regular Expression">.*</button>
+          </div>
+        </div>
+        <div id="search-summary" class="muted small pad"></div>
+        <div id="search-results"></div>
+      </div>
+
+      <div class="view" id="view-git" hidden>
+        <div class="view-header">
+          <span class="view-title">Source Control</span>
+          <div class="view-actions">
+            <button data-cmd="git.pull" title="Pull"><svg viewBox="0 0 24 24"><path d="M12 4v13M6 11l6 6 6-6M5 21h14"/></svg></button>
+            <button data-cmd="git.push" title="Push"><svg viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6M5 3h14"/></svg></button>
+            <button data-cmd="git.refresh" title="Refresh"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>
+          </div>
+        </div>
+        <div id="git-content"></div>
+      </div>
+    </section>
+    <div class="sash" id="sidebar-sash"></div>
+
+    <!-- editor area -->
+    <main id="main">
+      <div id="tabs"></div>
+      <div id="breadcrumbs"></div>
+      <div id="editor-area">
+        <div id="editor-host"></div>
+        <div id="diff-host" hidden></div>
+        <div class="sash vertical-sash" id="preview-sash" hidden></div>
+        <div id="preview" class="markdown-body" hidden></div>
+        <div id="welcome">
+          <div class="welcome-inner">
+            <h1>c<span>nano</span></h1>
+            <p class="muted">a calm place to write code</p>
+            <div class="welcome-grid">
+              <div>
+                <h3>Start</h3>
+                <a data-cmd="file.newFile">New File</a>
+                <a data-cmd="file.openFile">Open File…</a>
+                <a data-cmd="file.openFolder">Open Folder…</a>
+                <a data-cmd="git.clone">Clone Git Repository…</a>
+              </div>
+              <div>
+                <h3>Recent</h3>
+                <div id="recent-list"></div>
+              </div>
+            </div>
+            <div class="shortcuts">
+              <span><kbd>Ctrl</kbd><kbd>P</kbd> Go to file</span>
+              <span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>P</kbd> Commands</span>
+              <span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>V</kbd> Markdown preview</span>
+              <span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>G</kbd> Source control</span>
+              <span><kbd>Super</kbd><kbd>C</kbd> Compile &amp; run</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hsash" id="panel-sash" hidden></div>
+      <section id="panel" hidden>
+        <div class="panel-header">
+          <span class="panel-title">Terminal</span>
+          <div id="term-tabs"></div>
+          <div class="panel-actions">
+            <button data-cmd="terminal.new" title="New Terminal (Ctrl+Shift+`)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+            <button data-cmd="terminal.kill" title="Kill Terminal"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+            <button data-cmd="terminal.maximize" title="Maximize Panel"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+            <button data-cmd="terminal.toggle" title="Hide Panel"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+          </div>
+        </div>
+        <div id="term-host"></div>
+      </section>
+    </main>
+
+    <div class="sash" id="agent-sash" hidden></div>
+    <aside id="agentbar" hidden>
+      <div class="agent-header">
+        <span class="view-title">Agent</span>
+        <div class="view-actions" style="opacity:1">
+          <button data-cmd="agent.new" title="New chat"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button data-cmd="agent.settings" title="Agent settings & API keys"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+          <button data-cmd="agent.toggle" title="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+      </div>
+      <div id="agent-settings" hidden></div>
+      <div id="agent-messages"></div>
+      <div id="agent-composer">
+        <div id="agent-context"></div>
+        <textarea id="agent-input" rows="3" placeholder="Ask the agent… (Enter to send, Shift+Enter for newline)" spellcheck="false"></textarea>
+        <div class="agent-bottom">
+          <select id="agent-provider" title="Provider">
+            <option value="claude-cli">Claude Code (Pro plan)</option>
+            <option value="anthropic">Anthropic API</option>
+            <option value="openai">OpenAI</option>
+            <option value="gemini">Google Gemini</option>
+            <option value="openrouter">OpenRouter</option>
+            <option value="nvidia">NVIDIA Build</option>
+          </select>
+          <input id="agent-model" list="agent-models" placeholder="model" spellcheck="false" title="Model (type any id, or pick from the list)">
+          <datalist id="agent-models"></datalist>
+          <button class="icon-btn" id="agent-refresh-models" title="Fetch model list"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>
+          <button class="btn primary" id="agent-send" title="Send (Enter)"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer id="statusbar">
+    <div class="sb-left">
+      <span id="sb-branch" class="sb-item clickable" data-cmd="git.checkout" hidden></span>
+      <span id="sb-sync" class="sb-item clickable" data-cmd="git.sync" hidden></span>
+      <span id="sb-problems" class="sb-item clickable" title="Problems (F8: next)" hidden></span>
+      <span id="sb-msg" class="sb-item"></span>
+    </div>
+    <div class="sb-right">
+      <span id="sb-lsp" class="sb-item clickable" hidden></span>
+      <span id="sb-cursor" class="sb-item"></span>
+      <span id="sb-indent" class="sb-item clickable" data-cmd="editor.toggleIndent"></span>
+      <span id="sb-eol" class="sb-item"></span>
+      <span id="sb-lang" class="sb-item clickable" data-cmd="editor.changeLanguage"></span>
+    </div>
+  </footer>
+
+  <!-- quick input (palette / quick open / prompts) -->
+  <div id="quickinput" hidden>
+    <input id="qi-input" spellcheck="false">
+    <div id="qi-list"></div>
+  </div>
+  <div id="toasts"></div>
+  <div id="ctxmenu" hidden></div>
+
+  <!-- UMD bundles must load before Monaco's AMD loader, or they register as AMD modules -->
+  <script src="../node_modules/@xterm/xterm/lib/xterm.js"></script>
+  <script src="../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+  <script src="../node_modules/@xterm/addon-web-links/lib/addon-web-links.js"></script>
+  <script src="../node_modules/marked/lib/marked.umd.js"></script>
+  <script src="../node_modules/dompurify/dist/purify.min.js"></script>
+  <script src="../node_modules/monaco-editor/min/vs/loader.js"></script>
+  <script src="languages.js"></script>
+  <script src="theme.js"></script>
+  <script src="app.js"></script>
+  <script src="gutter.js"></script>
+  <script src="terminal.js"></script>
+  <script src="agent.js"></script>
+  <script src="lsp.js"></script>
+</body>
+</html>

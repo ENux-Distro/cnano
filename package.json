@@ -1,0 +1,24 @@
+{
+  "name": "cnano",
+  "version": "0.1.0",
+  "description": "An aesthetic code editor for C, C++, Assembly and shell",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js && node --check renderer/app.js && node --check renderer/languages.js && node --check renderer/theme.js && node --check agent.js && node --check renderer/gutter.js && node --check renderer/terminal.js && node --check renderer/agent.js",
+    "postinstall": "electron-rebuild -f -w node-pty"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.2.1",
+    "electron": "^45.0.0"
+  },
+  "dependencies": {
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/xterm": "^6.0.0",
+    "dompurify": "^3.4.17",
+    "marked": "^18.1.1",
+    "monaco-editor": "^0.57.0",
+    "node-pty": "^1.1.0"
+  }
+}

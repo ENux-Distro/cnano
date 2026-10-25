@@ -1,0 +1,13 @@
+#!/bin/sh
+# Launch cnano: `cnano`, `cnano .`, `cnano path/to/file.c`
+here="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+if [ "$1" = "--tui" ]; then
+  shift
+  # Dev checkout: use the staged build if present, else an installed cnano-tui.
+  if [ -d "$here/build/stage/tui" ]; then
+    PYTHONPATH="$here/build/stage/tui" exec python3 -m cnano_tui "$@"
+  fi
+  exec cnano-tui "$@"
+fi
+[ $# -gt 0 ] && set -- "$(realpath -- "$1")"
+exec "$here/node_modules/.bin/electron" "$here" "$@" >/dev/null 2>&1 &

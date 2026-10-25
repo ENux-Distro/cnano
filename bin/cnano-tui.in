@@ -1,0 +1,3 @@
+#!/bin/sh
+# cnano-tui launcher (also reachable as `cnano --tui`)
+PYTHONPATH="@LIBDIR@/tui${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m cnano_tui "$@"

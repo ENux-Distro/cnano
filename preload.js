@@ -1,0 +1,72 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+const invoke = (ch) => (...args) => ipcRenderer.invoke(ch, ...args);
+
+contextBridge.exposeInMainWorld('cnano', {
+  win: {
+    minimize: () => ipcRenderer.send('win:minimize'),
+    maximize: () => ipcRenderer.send('win:maximize'),
+    close: () => ipcRenderer.send('win:close'),
+    onMaximized: (fn) => ipcRenderer.on('win:maximized', (_e, v) => fn(v)),
+  },
+  argv: invoke('app:argv'),
+  settings: { load: invoke('settings:load'), save: invoke('settings:save') },
+  dialog: {
+    openFolder: invoke('dialog:openFolder'),
+    openFile: invoke('dialog:openFile'),
+    saveAs: invoke('dialog:saveAs'),
+    confirm: invoke('dialog:confirm'),
+    unsaved: invoke('dialog:unsaved'),
+  },
+  fs: {
+    readDir: invoke('fs:readDir'),
+    readFile: invoke('fs:readFile'),
+    writeFile: invoke('fs:writeFile'),
+    createFile: invoke('fs:createFile'),
+    createDir: invoke('fs:createDir'),
+    rename: invoke('fs:rename'),
+    delete: invoke('fs:delete'),
+    exists: invoke('fs:exists'),
+    reveal: invoke('fs:reveal'),
+    listAll: invoke('fs:listAll'),
+    search: invoke('fs:search'),
+    info: invoke('path:info'),
+  },
+  pty: {
+    create: invoke('pty:create'),
+    write: (id, d) => ipcRenderer.send('pty:write', id, d),
+    resize: (id, c, r) => ipcRenderer.send('pty:resize', id, c, r),
+    kill: (id) => ipcRenderer.send('pty:kill', id),
+    onData: (fn) => ipcRenderer.on('pty:data', (_e, id, d) => fn(id, d)),
+    onExit: (fn) => ipcRenderer.on('pty:exit', (_e, id, code) => fn(id, code)),
+  },
+  agent: {
+    keys: invoke('agent:keys'),
+    setKey: invoke('agent:setKey'),
+    models: invoke('agent:models'),
+    reset: invoke('agent:reset'),
+    send: invoke('agent:send'),
+    approve: (id, ok) => ipcRenderer.send('agent:approve', id, ok),
+    stop: (runId) => ipcRenderer.send('agent:stop', runId),
+    onEvent: (fn) => ipcRenderer.on('agent:event', (_e, runId, ev) => fn(runId, ev)),
+  },
+  lsp: {
+    available: invoke('lsp:available'),
+    open: invoke('lsp:open'),
+    change: (uri, text, version) => ipcRenderer.send('lsp:change', uri, text, version),
+    save: (uri, text) => ipcRenderer.send('lsp:save', uri, text),
+    close: (uri) => ipcRenderer.send('lsp:close', uri),
+    request: invoke('lsp:request'),
+    restart: invoke('lsp:restart'),
+    onDiagnostics: (fn) => ipcRenderer.on('lsp:diagnostics', (_e, p) => fn(p)),
+    onStatus: (fn) => ipcRenderer.on('lsp:status', (_e, s) => fn(s)),
+  },
+  git: {
+    run: invoke('git:run'),
+    status: invoke('git:status'),
+    show: invoke('git:show'),
+    log: invoke('git:log'),
+    branches: invoke('git:branches'),
+    clone: invoke('git:clone'),
+  },
+});

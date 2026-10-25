@@ -1,0 +1,23 @@
+[project]
+name = "cnano-tui"
+version = "0.1.0"
+description = "Terminal version of cnano: an aesthetic editor for C, C++, Assembly and shell"
+requires-python = ">=3.10"
+dependencies = [
+    "textual[syntax]>=8.0",
+    "tree-sitter-c>=0.23",
+    "tree-sitter-cpp>=0.23",
+]
+
+[project.scripts]
+cnano-tui = "cnano_tui.app:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["cnano_tui"]
+
+[tool.setuptools.package-data]
+cnano_tui = ["*.tcss"]
