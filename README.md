@@ -5,7 +5,7 @@
 <h1 align="center">cnano</h1>
 
 <p align="center">
-  <b>cnano is a text editor for low level developers, and is a calm place to write code.</b>
+  <b>[VIBECODED] cnano is a text editor for low level developers, and is a calm place to write code.</b>
 </p>
 
 <p align="center">
